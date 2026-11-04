@@ -10,65 +10,22 @@
 // ref() vuelve "reactiva" una variable: cuando cambia, Vue actualiza la pantalla sola.
 // computed() crea un valor que se calcula a partir de otros y se recalcula solo.
 // Traemos (importamos) las funciones ref y computed desde la librería Vue para poder usarlas aquí.
-import { ref, computed } from 'vue'
+// onMounted() ejecuta código apenas el componente aparece en pantalla (lo usamos para pedir las pizzas a la API).
+import { ref, computed, onMounted } from 'vue'
 
 // ---------------------------------------------------------------
 // DATOS: el menú de pizzas (los "productos" de la pizzería)
 // Cada pizza tiene un precio distinto para cada tamaño.
 // ---------------------------------------------------------------
-// Creamos la lista de pizzas dentro de ref([...]) para que sea reactiva:
-// si más adelante agregamos un sabor, el menú en pantalla se actualiza solo.
-const pizzas = ref([
-  // Abre el objeto (la "ficha") de la primera pizza.
-  {
-    // id: número único que identifica a esta pizza (Vue lo usa en el :key del v-for).
-    id: 1,
-    // nombre: el texto que se muestra como título de la pizza.
-    nombre: 'Hawaiana',
-    // ingredientes: la descripción que aparece debajo del nombre.
-    ingredientes: 'Jamón, piña y queso mozzarella',
-    // precios: un objeto con el precio de cada tamaño (personal, mediana y familiar).
-    precios: { personal: 14000, mediana: 28000, familiar: 42000 }
-  // Cierra la ficha de la Hawaiana; la coma separa esta pizza de la siguiente.
-  },
-  // Abre la ficha de la segunda pizza.
-  {
-    // Identificador único de esta pizza.
-    id: 2,
-    // Nombre que se muestra en el menú.
-    nombre: 'Pollo con champiñones',
-    // Descripción de los ingredientes.
-    ingredientes: 'Pollo desmechado, champiñones y salsa blanca',
-    // Precio según el tamaño.
-    precios: { personal: 16000, mediana: 32000, familiar: 47000 }
-  // Cierra la ficha de Pollo con champiñones.
-  },
-  // Abre la ficha de la tercera pizza.
-  {
-    // Identificador único de esta pizza.
-    id: 3,
-    // Nombre que se muestra en el menú.
-    nombre: 'Pepperoni',
-    // Descripción de los ingredientes.
-    ingredientes: 'Pepperoni, salsa de tomate y mozzarella',
-    // Precio según el tamaño.
-    precios: { personal: 15000, mediana: 30000, familiar: 45000 }
-  // Cierra la ficha de la Pepperoni.
-  },
-  // Abre la ficha de la cuarta pizza.
-  {
-    // Identificador único de esta pizza.
-    id: 4,
-    // Nombre que se muestra en el menú.
-    nombre: 'Vegetariana',
-    // Descripción de los ingredientes.
-    ingredientes: 'Pimentón, cebolla, aceitunas, maíz y tomate',
-    // Precio según el tamaño.
-    precios: { personal: 13000, mediana: 26000, familiar: 39000 }
-  // Cierra la ficha de la Vegetariana (es la última, por eso no lleva coma).
-  }
-// Cierra la lista [ ] y el ref( ).
-])
+// La lista de pizzas empieza VACÍA: los datos ya no están escritos aquí, ahora vienen de la API (db.json).
+// Sigue dentro de ref([]) para que sea reactiva: cuando lleguen las pizzas de la API, el menú se dibuja solo.
+const pizzas = ref([])
+
+// Dirección de la API local que crea json-server (se enciende con: npm run api).
+const URL_API = 'http://localhost:3000/pizzas'
+
+// Mensaje de error de la API; si está vacío no se muestra nada (se usa con v-if en el template).
+const errorApi = ref('')
 
 // Los tres tamaños disponibles (se recorren con v-for en el selector)
 // Esta lista NO usa ref porque nunca cambia: siempre son los mismos tres tamaños.
@@ -297,9 +254,38 @@ function nuevoPedido() {
 // Cierra la función nuevoPedido.
 }
 
+// ---------------------------------------------------------------
+// API: traer (GET) y enviar (POST) pizzas con fetch
+// ---------------------------------------------------------------
+
+// Pide las pizzas a la API. "async" permite usar "await" para esperar la respuesta sin congelar la página.
+async function cargarPizzas() {
+  // try: intentamos hacer la petición; si algo falla (la API está apagada), saltamos al catch.
+  try {
+    // fetch hace una petición GET a la API y "await" espera a que responda.
+    const respuesta = await fetch(URL_API)
+    // respuesta.ok es true si el servidor respondió bien (códigos 200 a 299); si no, lanzamos un error.
+    if (!respuesta.ok) throw new Error('La API respondió con error ' + respuesta.status)
+    // .json() convierte la respuesta (texto) en una lista de JavaScript, y la guardamos en pizzas: el menú se dibuja solo.
+    pizzas.value = await respuesta.json()
+    // Si todo salió bien, borramos cualquier mensaje de error anterior.
+    errorApi.value = ''
+  // catch: aquí llegamos si no se pudo conectar con la API.
+  } catch (e) {
+    // Guardamos el mensaje; el v-if del template lo muestra en pantalla.
+    errorApi.value = 'No se pudo conectar con la API. ¿Ejecutaste npm run api?'
+  // Cierra el try/catch.
+  }
+// Cierra la función cargarPizzas.
+}
+
+// onMounted ejecuta cargarPizzas() una sola vez, apenas el componente aparece en pantalla.
+onMounted(cargarPizzas)
+
 // Agrega un sabor nuevo al menú con los datos del formulario
 // Se ejecuta al enviar el formulario «Agregar un sabor al menú».
-function agregarSabor() {
+// Ahora es "async" porque tiene que esperar la respuesta de la API antes de mostrar la pizza.
+async function agregarSabor() {
   // Validación sencilla: todos los campos son obligatorios
   // Si el nombre está vacío o falta alguno de los tres precios...
   if (!nuevoNombre.value.trim() || !nuevoPersonal.value || !nuevoMediana.value || !nuevoFamiliar.value) {
@@ -310,10 +296,8 @@ function agregarSabor() {
   // Cierra el if de la validación.
   }
 
-  // push agrega la pizza nueva al final del menú; como pizzas es un ref, la pantalla se actualiza sola.
-  pizzas.value.push({
-    // Date.now() da los milisegundos actuales: un número que nunca se repite, sirve como id único.
-    id: Date.now(),
+  // Armamos la pizza nueva SIN id: json-server le asigna el id automáticamente al guardarla.
+  const nuevaPizza = {
     // Nombre escrito por el usuario, sin espacios sobrantes.
     nombre: nuevoNombre.value.trim(),
     // Si no escribió ingredientes, se usa el texto 'Receta de la casa'.
@@ -328,8 +312,35 @@ function agregarSabor() {
       familiar: nuevoFamiliar.value
     // Cierra el objeto de precios.
     }
-  // Cierra el objeto de la pizza y el push.
-  })
+  // Cierra el objeto de la pizza nueva.
+  }
+
+  // try: intentamos guardar la pizza en la API; si falla, saltamos al catch.
+  try {
+    // fetch con method 'POST' ENVÍA datos a la API para que los guarde en db.json.
+    const respuesta = await fetch(URL_API, {
+      // POST significa "crear un registro nuevo".
+      method: 'POST',
+      // Le avisamos a la API que los datos van en formato JSON.
+      headers: { 'Content-Type': 'application/json' },
+      // JSON.stringify convierte el objeto de JavaScript en texto JSON para poder enviarlo.
+      body: JSON.stringify(nuevaPizza)
+    // Cierra las opciones y el fetch.
+    })
+    // Si la API no respondió bien, lanzamos un error para ir al catch.
+    if (!respuesta.ok) throw new Error('La API respondió con error ' + respuesta.status)
+    // La API nos devuelve la pizza ya guardada (con el id que le asignó).
+    const pizzaGuardada = await respuesta.json()
+    // push agrega la pizza guardada al final del menú; como pizzas es un ref, la pantalla se actualiza sola.
+    pizzas.value.push(pizzaGuardada)
+  // catch: aquí llegamos si no se pudo guardar (por ejemplo, la API está apagada).
+  } catch (e) {
+    // Mostramos el error en el formulario y NO limpiamos los campos, para que el usuario no pierda lo escrito.
+    error.value = 'No se pudo guardar el sabor. ¿Ejecutaste npm run api?'
+    // Salimos de la función.
+    return
+  // Cierra el try/catch.
+  }
 
   // Limpiar el formulario: como está enlazado con v-model, los campos se vacían solos
   // Vacía el campo del nombre.
@@ -396,6 +407,8 @@ function agregarSabor() {
           v-for repite una fila por cada pizza de la lista.
           :key le da a Vue un identificador único para cada fila.
         -->
+        <!-- v-if="errorApi": este aviso solo aparece si no se pudo conectar con la API; {{ errorApi }} escribe el mensaje -->
+        <p v-if="errorApi" class="error">{{ errorApi }}</p>
         <ul class="lista-pizzas">
           <!-- v-for="pizza in pizzas" crea un <li> por cada pizza del menú; :key="pizza.id" usa el id de la pizza como identificador único -->
           <li v-for="pizza in pizzas" :key="pizza.id" class="pizza">

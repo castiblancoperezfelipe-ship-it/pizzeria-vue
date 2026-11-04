@@ -1,0 +1,44 @@
+{
+  "pizzas": [
+    {
+      "id": 1,
+      "nombre": "Hawaiana",
+      "ingredientes": "Jamón, piña y queso mozzarella",
+      "precios": {
+        "personal": 14000,
+        "mediana": 28000,
+        "familiar": 42000
+      }
+    },
+    {
+      "id": 2,
+      "nombre": "Pollo con champiñones",
+      "ingredientes": "Pollo desmechado, champiñones y salsa blanca",
+      "precios": {
+        "personal": 16000,
+        "mediana": 32000,
+        "familiar": 47000
+      }
+    },
+    {
+      "id": 3,
+      "nombre": "Pepperoni",
+      "ingredientes": "Pepperoni, salsa de tomate y mozzarella",
+      "precios": {
+        "personal": 15000,
+        "mediana": 30000,
+        "familiar": 45000
+      }
+    },
+    {
+      "id": 4,
+      "nombre": "Vegetariana",
+      "ingredientes": "Pimentón, cebolla, aceitunas, maíz y tomate",
+      "precios": {
+        "personal": 13000,
+        "mediana": 26000,
+        "familiar": 39000
+      }
+    }
+  ]
+}
