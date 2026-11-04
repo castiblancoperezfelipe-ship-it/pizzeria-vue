@@ -1,0 +1,91 @@
+/*
+  Estilos globales: el local es un horno de leña.
+  Las fuentes están guardadas en src/assets/fonts, así la página funciona sin internet.
+*/
+
+/* Alfa Slab One: letras gruesas, como marcadas a fuego en la madera (títulos y precios) */
+@font-face {
+  font-family: 'Alfa Slab One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/alfa-slab-one-latin.woff2') format('woff2');
+}
+
+/* Bricolage Grotesque: fuente variable para el texto (un solo archivo trae todos los pesos) */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('./assets/fonts/bricolage-grotesque-latin.woff2') format('woff2');
+}
+
+/* Colores y fuente de toda la página */
+:root {
+  /* Materiales del horno */
+  --hollin: #2a1d19;        /* fondo: hollín de la boca del horno */
+  --carbon: #1f1512;        /* carbón apagado (losas más oscuras) */
+  --ladrillo: #8a3b24;      /* ladrillo refractario */
+  --ladrillo-oscuro: #5e2716;
+  --brasa: #ff7a1a;         /* la luz que sale del fuego */
+  --llama: #ffc247;         /* el centro más caliente de la llama */
+  --madera: #b9844f;        /* tabla y pala de madera */
+  --madera-oscura: #7a5230;
+  --ceniza: #d9cfc4;        /* papel de la comanda y texto claro */
+  --humo: #a8998b;          /* texto secundario sobre fondo oscuro */
+  --tinta: #24170f;         /* texto oscuro sobre madera y papel */
+
+  /* Colores del dibujo de la pizza */
+  --tomate: #c8321f;
+  --pepperoni: #7d1a10;
+  --masa: #f2d29b;
+  --corteza: #c98a3e;
+  --queso: #fff1c7;
+
+  font-family: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  font-size: 106.25%; /* 17px de base: se lee bien proyectado en la exposición */
+  color: var(--ceniza);
+  line-height: 1.5;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+/*
+  Fondo: pared de ladrillo casi apagada por el hollín.
+  El SVG dibuja las juntas de dos filas de ladrillos (la segunda fila va desplazada).
+  El resplandor de arriba a la derecha es la luz del horno.
+*/
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--hollin);
+  background-image:
+    radial-gradient(ellipse 60% 70% at 100% 0%, rgba(255, 122, 26, 0.16), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='72'%3E%3Cpath d='M0 1H84M0 37H84M1 0V36M43 36V72' stroke='%23000' stroke-opacity='.25' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 84px 72px;
+  background-attachment: fixed;
+}
+
+/* Los títulos de toda la página */
+h1, h2, h3 {
+  font-family: 'Alfa Slab One', Georgia, serif;
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Botones y campos usan la misma fuente de la página */
+button, input, textarea { font: inherit; }
+
+/* Contorno visible al navegar con teclado (accesibilidad) */
+:focus-visible {
+  outline: 3px solid var(--llama);
+  outline-offset: 3px;
+}
+
+/* Sin animaciones si la persona lo pidió en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

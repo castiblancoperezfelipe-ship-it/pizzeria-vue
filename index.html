@@ -1,0 +1,28 @@
+<!doctype html>
+<!-- La línea de arriba (doctype) le dice al navegador que esta página usa HTML5 -->
+<!-- <html> es la etiqueta que envuelve toda la página; lang="es" indica que está en español -->
+<html lang="es">
+  <!-- <head> guarda información de la página que no se ve directamente -->
+  <head>
+    <!-- charset UTF-8 permite mostrar bien tildes, ñ y emojis -->
+    <meta charset="UTF-8" />
+    <!-- El ícono de la pestaña del navegador: un emoji de pizza dibujado con SVG -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>" />
+    <!-- viewport hace que la página se adapte al ancho del celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- El texto que aparece en la pestaña del navegador -->
+    <title>Pizzería La Esquina</title>
+    <!-- Las fuentes se cargan desde src/style.css (archivos locales, sin internet) -->
+  <!-- Cierra el head -->
+  </head>
+  <!-- <body> es todo lo que se ve en pantalla -->
+  <body>
+    <!-- Aquí Vue "monta" toda la aplicación -->
+    <!-- Este div empieza vacío; main.js lo busca por su id="app" y dibuja dentro la pizzería -->
+    <div id="app"></div>
+    <!-- Carga el archivo main.js, que arranca Vue; type="module" permite usar import -->
+    <script type="module" src="/src/main.js"></script>
+  <!-- Cierra el body -->
+  </body>
+<!-- Cierra el html -->
+</html>
