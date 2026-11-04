@@ -22,7 +22,8 @@ import { ref, computed, onMounted } from 'vue'
 const pizzas = ref([])
 
 // Dirección de la API local que crea json-server (se enciende con: npm run api).
-const URL_API = 'http://localhost:3000/pizzas'
+// Usa el puerto 3001 porque en este computador otro programa ya ocupa el 3000.
+const URL_API = 'http://localhost:3001/pizzas'
 
 // Mensaje de error de la API; si está vacío no se muestra nada (se usa con v-if en el template).
 const errorApi = ref('')
